@@ -1,0 +1,33 @@
+name: Reusable CI/CD for Node.js Fastify
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: false
+        type: string
+        default: '22.x'
+        description: 'Versión de Node.js a utilizar'
+      dockerfile-path:
+        required: false
+        type: string
+        default: './Dockerfile'
+        description: 'Ruta al Dockerfile'
+
+jobs:
+  lint:
+    uses: ./.github/workflows/node-lint.yml
+    with:
+      node-version: ${{ inputs.node-version }}
+
+  test:
+    needs: [lint]
+    uses: ./.github/workflows/node-test.yml
+    with:
+      node-version: ${{ inputs.node-version }}
+
+  docker-publish:
+    needs: [test]
+    uses: ./.github/workflows/docker-publish.yml
+    with:
+      dockerfile-path: ${{ inputs.dockerfile-path }}
