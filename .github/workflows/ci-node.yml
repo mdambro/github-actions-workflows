@@ -35,6 +35,7 @@ jobs:
 
   docker-publish:
     needs: [test]
+    if: ${{ !cancelled() && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
     uses: ./.github/workflows/docker-publish.yml
     with:
       dockerfile-path: ${{ inputs.dockerfile-path }}
