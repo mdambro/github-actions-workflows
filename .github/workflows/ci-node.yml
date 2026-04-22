@@ -33,9 +33,16 @@ jobs:
     with:
       node-version: ${{ inputs.node-version }}
 
-  docker-publish:
+  security-scan:
+    if: ${{ !inputs.pre-release }}
     needs: [test]
-    if: ${{ !cancelled() && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    uses: ./.github/workflows/security-scan.yml
+    with:
+      node-version: ${{ inputs.node-version }}
+
+  docker-publish:
+    needs: [security-scan]
+    if: ${{ !cancelled() && (needs.security-scan.result == 'success' || needs.security-scan.result == 'skipped') }}
     uses: ./.github/workflows/docker-publish.yml
     with:
       dockerfile-path: ${{ inputs.dockerfile-path }}
