@@ -7,21 +7,28 @@ on:
         required: false
         type: string
         default: '22.x'
-        description: 'Versión de Node.js a utilizar'
+        description: 'Node version'
       dockerfile-path:
         required: false
         type: string
         default: './Dockerfile'
-        description: 'Ruta al Dockerfile'
+        description: 'Path to the Dockerfile'
+      pre-release:
+        required: false
+        type: boolean
+        default: false
+        description: 'Only deploy in pre-release versions'
 
 jobs:
   lint:
+    if: ${{ !inputs.pre-release }}
     uses: ./.github/workflows/node-lint.yml
     with:
       node-version: ${{ inputs.node-version }}
 
   test:
     needs: [lint]
+    if: ${{ !inputs.pre-release }}
     uses: ./.github/workflows/node-test.yml
     with:
       node-version: ${{ inputs.node-version }}

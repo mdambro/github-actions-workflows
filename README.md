@@ -28,6 +28,11 @@ on:
 
 jobs:
   build-and-deploy:
+    # ⚠️ IMPORTANTE: Otorga permisos para subir la imagen a GitHub Packages (GHCR)
+    permissions:
+      contents: read
+      packages: write
+
     # Recuerda usar la rama adecuada (ej. @main) y colocar tu nombre de usuario de GitHub
     uses: TU_USUARIO_U_ORGANIZACION/github-actions-workflows/.github/workflows/ci-node.yml@main
     with:
@@ -48,9 +53,21 @@ jobs:
 
 Dado que el paso final de este workflow empuja una imagen hacia **GitHub Container Registry (GHCR)** utilizando el `GITHUB_TOKEN` integrado, el repositorio que invoca este workflow **debe tener permisos de escritura sobre los paquetes**.
 
-Si el pipeline te arroja un error `403 Forbidden` en el paso de Docker, sigue estos pasos en el repositorio destino:
+Si el pipeline te arroja un error como `The nested job 'docker-build-push' is requesting 'packages: write', but is only allowed 'packages: read'`, tienes dos formas de solucionarlo:
 
-1. Ve a la pestaña **Settings** del repositorio.
+### Opción 1: En tu archivo `ci.yml` (Recomendado)
+Agrega explícitamente los permisos al job que llama al workflow reutilizable (como se muestra en el ejemplo de arriba):
+
+```yaml
+    permissions:
+      contents: read
+      packages: write
+```
+
+### Opción 2: A nivel del repositorio
+Si prefieres configurarlo para todos los workflows del repositorio:
+
+1. Ve a la pestaña **Settings** del repositorio destino.
 2. En el menú izquierdo, ve a **Actions** > **General**.
 3. Baja hasta la sección que dice **Workflow permissions**.
 4. Selecciona la opción **Read and write permissions**.
